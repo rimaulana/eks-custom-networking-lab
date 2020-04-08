@@ -364,7 +364,7 @@ Resources:
     Type: "Custom::CfnStackAssumeRole"
     Version: '1.0'
     Properties:
-      ServiceToken: !Ref LambdaStackMaker
+      ServiceToken: !GetAtt LambdaStackMaker.Arn
       RoleArn: !GetAtt IamStack.Outputs.ControlPlaneProvisionRoleArn
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/eks/templates/control-plane.yaml'
