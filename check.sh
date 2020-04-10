@@ -1,13 +1,13 @@
 #!/bin/bash
 
 PODIPS=`kubectl --kubeconfig=/home/ec2-user/.kube/config get pods -l app=workload -n default -o=jsonpath='{range .items[*]}{.status.podIP}'`
-PODIPRESULT="true"
+PODIPRESULT="false"
 REGEXP="^100\.64\..*"
 
 for ip in ${PODIPS[@]}
 do
     if [[ $ip =~ $REGEXP ]]; then
-        continue
+        PODIPRESULT="true"
     else
         PODIPRESULT="false"
         break
@@ -15,24 +15,28 @@ do
 done
 
 RESTARTS=`kubectl --kubeconfig=/home/ec2-user/.kube/config get pods -l app=workload -n default -o=jsonpath='{range .items[*]}{.status.containerStatuses[0].restartCount}'`
-RESTARTRESULT="true"
+RESTARTRESULT="false"
 
 for restart in ${RESTARTS[@]}
 do
     if [[ "$restart" -ne "0" ]]; then
         RESTARTRESULT="false"
         break
+    else
+        RESTARTRESULT="true"
     fi
 done
 
 SYSTEMRESTARTS=`kubectl --kubeconfig=/home/ec2-user/.kube/config get pods -n kube-system -o=jsonpath='{range .items[*]}{.status.containerStatuses[0].restartCount}'`
-SYSTEMRESTARTRESULT="true"
+SYSTEMRESTARTRESULT="false"
 
 for restart in ${SYSTEMRESTARTS[@]}
 do
     if [[ "$restart" -ne "0" ]]; then
         SYSTEMRESTARTRESULT="false"
         break
+    else
+        SYSTEMRESTARTRESULT="true"
     fi
 done
 
@@ -61,7 +65,7 @@ for row in $(echo "${NODECONFIG}" | jq -r '.[] | @base64'); do
     fi
 done
 
-CHEAT="false"
+CHEAT="true"
 
 POD_IMAGE=`kubectl --kubeconfig=/home/ec2-user/.kube/config get pods -l app=workload -n default -o=jsonpath='{range .items[*]}{.spec.containers[0].image}{"\n"}'`
 
@@ -70,6 +74,8 @@ do
     if [[ $image != "rimaulana/wget-workload" ]]; then
         CHEAT="true"
         break
+    else
+        CHEAT="false"
     fi
 done
 
