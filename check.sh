@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PODIPS=`kubectl --kubeconfig=/home/ec2-user/.kube/config get pods -l app=workload -n default -o=jsonpath='{range .items[*]}{.status.podIP}'`
+PODIPS=`/usr/local/bin/kubectl --kubeconfig=/home/ec2-user/.kube/config get pods -l app=workload -n default -o=jsonpath='{range .items[*]}{.status.podIP}'`
 PODIPRESULT="false"
 REGEXP="^100\.64\..*"
 
@@ -14,7 +14,7 @@ do
     fi
 done
 
-RESTARTS=`kubectl --kubeconfig=/home/ec2-user/.kube/config get pods -l app=workload -n default -o=jsonpath='{range .items[*]}{.status.containerStatuses[0].restartCount}'`
+RESTARTS=`/usr/local/bin/kubectl --kubeconfig=/home/ec2-user/.kube/config get pods -l app=workload -n default -o=jsonpath='{range .items[*]}{.status.containerStatuses[0].restartCount}'`
 RESTARTRESULT="false"
 
 for restart in ${RESTARTS[@]}
@@ -27,7 +27,7 @@ do
     fi
 done
 
-SYSTEMRESTARTS=`kubectl --kubeconfig=/home/ec2-user/.kube/config get pods -n kube-system -o=jsonpath='{range .items[*]}{.status.containerStatuses[0].restartCount}'`
+SYSTEMRESTARTS=`/usr/local/bin/kubectl --kubeconfig=/home/ec2-user/.kube/config get pods -n kube-system -o=jsonpath='{range .items[*]}{.status.containerStatuses[0].restartCount}'`
 SYSTEMRESTARTRESULT="false"
 
 for restart in ${SYSTEMRESTARTS[@]}
@@ -40,7 +40,7 @@ do
     fi
 done
 
-NODECONFIG=`kubectl --kubeconfig=/home/ec2-user/.kube/config get ds aws-node -n kube-system -o json | jq '.spec.template.spec.containers[0].env'`
+NODECONFIG=`/usr/local/bin/kubectl --kubeconfig=/home/ec2-user/.kube/config get ds aws-node -n kube-system -o json | jq '.spec.template.spec.containers[0].env'`
 CONFIG_LABEL="false"
 EXTERNAL_SNAT="false"
 
@@ -67,7 +67,7 @@ done
 
 CHEAT="true"
 
-POD_IMAGE=`kubectl --kubeconfig=/home/ec2-user/.kube/config get pods -l app=workload -n default -o=jsonpath='{range .items[*]}{.spec.containers[0].image}{"\n"}'`
+POD_IMAGE=`/usr/local/bin/kubectl --kubeconfig=/home/ec2-user/.kube/config get pods -l app=workload -n default -o=jsonpath='{range .items[*]}{.spec.containers[0].image}{"\n"}'`
 
 for image in ${POD_IMAGE[@]}
 do
@@ -80,7 +80,7 @@ do
 done
 
 if [[ $CHEAT != "true" ]]; then
-    POD_CMD=`kubectl --kubeconfig=/home/ec2-user/.kube/config get pods -l app=workload -n default -o=jsonpath='{range .items[*]}{.spec.containers[0].command}{"\n"}'`
+    POD_CMD=`/usr/local/bin/kubectl --kubeconfig=/home/ec2-user/.kube/config get pods -l app=workload -n default -o=jsonpath='{range .items[*]}{.spec.containers[0].command}{"\n"}'`
 
     for cmd in ${POD_CMD[@]}
     do
@@ -92,7 +92,7 @@ if [[ $CHEAT != "true" ]]; then
 fi
 
 if [[ $CHEAT != "true" ]]; then
-    POD_ARGS=`kubectl --kubeconfig=/home/ec2-user/.kube/config get pods -l app=workload -n default -o=jsonpath='{range .items[*]}{.spec.containers[0].args}{"\n"}'`
+    POD_ARGS=`/usr/local/bin/kubectl --kubeconfig=/home/ec2-user/.kube/config get pods -l app=workload -n default -o=jsonpath='{range .items[*]}{.spec.containers[0].args}{"\n"}'`
 
     for args in ${POD_ARGS[@]}
     do
